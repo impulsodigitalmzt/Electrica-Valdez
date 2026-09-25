@@ -1,0 +1,630 @@
+import { useState } from "react";
+import {
+  ArrowRight,
+  CircleDollarSign,
+  Headphones,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Navigation,
+  Package,
+  Phone,
+  ShieldCheck,
+  Truck,
+} from "lucide-react";
+import { StoreVideo } from "@/components/StoreVideo";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { AppLink } from "@/lib/nav";
+import {
+  BRANCHES,
+  DOMICILIO_MATRIZ,
+  EMPRESA_PRIORIDAD,
+  EMPRESA_RAZON,
+  FACEBOOK_URL,
+  LOGO_MARK,
+  MAIN_EMAIL,
+  MAIN_EMAILS,
+  MARCAS_CATALOGO,
+  TELEFONOS_PIE,
+  TEL_PRINCIPAL,
+  WHATSAPP_DISPLAY,
+  emailDe,
+  mapsDirHref,
+  telHref,
+  VIDEOS,
+  WHATSAPP_URL,
+  type Branch,
+} from "@/lib/brand";
+
+export function ScrollingBanner() {
+  const frase = "Más de 10,000 productos disponibles  ·  Envío GRATIS en compras mayores a $1,000  ·  Envío GRATIS dentro de zona de la misma ciudad, sin mínimo  ·  Asesoría técnica  ·  ";
+  return (
+    <section className="overflow-hidden bg-primary py-4 text-primary-foreground sm:py-5" aria-label="Promociones de envío">
+      <div className="ev-marquee flex w-max whitespace-nowrap text-sm font-bold uppercase tracking-wide sm:text-base">
+        <span className="px-6">{frase.repeat(2)}</span>
+        <span className="px-6" aria-hidden>
+          {frase.repeat(2)}
+        </span>
+      </div>
+    </section>
+  );
+}
+
+export function BrandLogoMarquee() {
+  function pista(prefijo: string, interactivo: boolean) {
+    return (
+      <div className="flex items-center gap-6 px-3 sm:gap-8 sm:px-4" aria-hidden={interactivo ? undefined : true}>
+        {MARCAS_CATALOGO.map((brand) => {
+          const celda = "flex h-16 w-36 shrink-0 items-center justify-center sm:h-[4.5rem] sm:w-40";
+          const img = (
+            <img
+              src={brand.logo}
+              alt=""
+              className="h-12 w-[8.5rem] object-contain sm:h-14 sm:w-36"
+            />
+          );
+          return interactivo ? (
+            <AppLink
+              key={`${prefijo}-${brand.label}`}
+              to={`/buscar?q=${encodeURIComponent(brand.q)}`}
+              className={celda}
+              aria-label={`Ver productos ${brand.label}`}
+            >
+              {img}
+            </AppLink>
+          ) : (
+            <span key={`${prefijo}-${brand.label}`} className={celda}>
+              {img}
+            </span>
+          );
+        })}
+      </div>
+    );
+  }
+
+  return (
+    <section className="border-y bg-background py-8 sm:py-10" aria-labelledby="marcas-barra">
+      <div className="mx-auto mb-5 max-w-7xl px-4 text-center sm:mb-6">
+        <span className="text-xs font-bold uppercase text-accent">Marcas de confianza</span>
+        <h2 id="marcas-barra" className="mt-1.5 text-xl font-extrabold text-black sm:text-2xl">
+          Tenemos las mejores marcas del mercado
+        </h2>
+      </div>
+      <div className="overflow-hidden">
+        <div className="ev-marquee-brands flex w-max items-center">
+          {pista("a", true)}
+          {pista("b", false)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function PromoEnvio() {
+  return (
+    <section className="bg-secondary py-8 text-center text-secondary-foreground">
+      <p className="text-xs font-bold uppercase tracking-widest">Envío sin costo</p>
+      <h2 className="mt-1 text-2xl font-extrabold sm:text-3xl">A partir de $1,000 MXN</h2>
+      <p className="mt-2 text-sm">Aplican restricciones según peso, volumen y destino. Recoge también en sucursal.</p>
+      <Button className="mt-5 bg-primary font-bold text-primary-foreground hover:bg-primary/90" asChild>
+        <AppLink to="/buscar">
+          Ver catálogo <ArrowRight />
+        </AppLink>
+      </Button>
+    </section>
+  );
+}
+
+export function Testimonials() {
+  const opiniones = [
+    { nombre: "Ing. Ramírez", ciudad: "Mazatlán, Sin.", texto: "Pedí el material de una casa completa y me armaron la lista el mismo día en Matriz." },
+    { nombre: "Arq. Beltrán", ciudad: "Culiacán, Sin.", texto: "Buen surtido de Tecnolite y Siemens. Recogí en sucursal sin esperas." },
+    { nombre: "Constructora del Puerto", ciudad: "Mazatlán, Sin.", texto: "Buen precio en cable y centros de carga. El material salió el mismo día." },
+  ];
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-16" aria-labelledby="opiniones">
+      <div className="text-center">
+        <span className="text-xs font-bold uppercase text-accent">Nuestros clientes opinan</span>
+        <h2 id="opiniones" className="mt-2 text-3xl font-extrabold text-black">
+          Confianza de obra en obra
+        </h2>
+      </div>
+      <div className="mt-10 grid gap-5 md:grid-cols-3">
+        {opiniones.map((item) => (
+          <blockquote key={item.nombre} className="border bg-card p-6">
+            <p className="text-sm leading-relaxed text-muted-foreground">“{item.texto}”</p>
+            <footer className="mt-5">
+              <cite className="not-italic text-sm font-bold text-black">{item.nombre}</cite>
+              <p className="text-xs text-muted-foreground">{item.ciudad}</p>
+            </footer>
+          </blockquote>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export function TrustBar() {
+  const benefits = [
+    { icon: Truck, title: "Envío seguro", text: "Cobertura en todo México y rastreo de tu pedido." },
+    { icon: Headphones, title: "Asesoría técnica", text: "Expertos listos para ayudarte a elegir." },
+    { icon: ShieldCheck, title: "Compra con garantía", text: "Productos originales y pagos protegidos." },
+  ];
+  return (
+    <section className="bg-primary py-10 text-primary-foreground">
+      <div className="mx-auto grid max-w-7xl gap-7 px-4 sm:grid-cols-3">
+        {benefits.map(({ icon: Icon, title, text }) => (
+          <div key={title} className="flex gap-4">
+            <span className="flex size-12 shrink-0 items-center justify-center border border-primary-foreground/30 text-secondary">
+              <Icon className="size-6" />
+            </span>
+            <div>
+              <h3 className="text-lg font-bold">{title}</h3>
+              <p className="mt-1 text-sm text-primary-foreground/70">{text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export function PromoContactosVideo() {
+  const video = VIDEOS.promocion;
+  return (
+    <section className="w-full bg-background py-10 sm:py-12" aria-labelledby="video-tecnolite">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <span className="text-xs font-bold uppercase text-accent">{video.kicker}</span>
+            <h2 id="video-tecnolite" className="mt-2 text-2xl font-extrabold text-black sm:text-4xl">
+              {video.heading}
+            </h2>
+          </div>
+          <Button variant="ghost" className="hidden text-black sm:flex" asChild>
+            <AppLink to={video.to}>
+              {video.cta} <ArrowRight />
+            </AppLink>
+          </Button>
+        </div>
+        <AppLink to={video.to} className="block w-full overflow-hidden" aria-label={video.cta}>
+          <StoreVideo
+            src={video.src}
+            title={video.title}
+            controls={false}
+            className="aspect-video w-full"
+          />
+        </AppLink>
+      </div>
+    </section>
+  );
+}
+
+export function SucursalTourVideo() {
+  const video = VIDEOS.sucursal;
+  return (
+    <section className="w-full bg-background py-10 sm:py-12" aria-labelledby="video-sucursal">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <span className="text-xs font-bold uppercase text-accent">{video.kicker}</span>
+            <h2 id="video-sucursal" className="mt-2 text-2xl font-extrabold text-black sm:text-4xl">
+              {video.heading}
+            </h2>
+          </div>
+          <Button variant="ghost" className="hidden text-black sm:flex" asChild>
+            <AppLink to={video.to}>
+              {video.cta} <ArrowRight />
+            </AppLink>
+          </Button>
+        </div>
+        <AppLink to={video.to} className="block w-full overflow-hidden" aria-label={video.cta}>
+          <StoreVideo
+            src={video.src}
+            title={video.title}
+            controls={false}
+            className="aspect-video w-full"
+          />
+        </AppLink>
+      </div>
+    </section>
+  );
+}
+
+export function Brands() {
+  const makita = VIDEOS.makita;
+  return (
+    <section id="marcas" className="mx-auto max-w-7xl px-4 py-16">
+      <div className="text-center">
+        <span className="text-xs font-bold uppercase text-accent">Aliados de confianza</span>
+        <h2 className="mt-2 text-3xl font-extrabold text-black">Marcas que conectan tus ideas</h2>
+      </div>
+      <div className="mt-10 grid items-center gap-6 overflow-hidden border bg-card lg:grid-cols-2">
+        <StoreVideo src={makita.src} title={makita.title} className="aspect-video w-full" />
+        <div className="px-6 py-8 sm:px-10">
+          <p className="text-xs font-bold uppercase tracking-widest text-accent">{makita.kicker}</p>
+          <h3 className="mt-2 text-2xl font-extrabold text-black sm:text-3xl">{makita.heading}</h3>
+          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{makita.text}</p>
+          <Button className="mt-6 font-bold" asChild>
+            <AppLink to={makita.to}>
+              {makita.cta} <ArrowRight />
+            </AppLink>
+          </Button>
+        </div>
+      </div>
+      <div className="mt-9 grid grid-cols-2 border sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+        {MARCAS_CATALOGO.map((brand) => (
+          <AppLink
+            key={brand.label}
+            to={`/buscar?q=${encodeURIComponent(brand.q)}`}
+            className="flex h-28 items-center justify-center overflow-hidden border-b border-r bg-background px-5 transition hover:bg-muted"
+            aria-label={`Ver productos ${brand.label}`}
+          >
+            <img
+              src={brand.logo}
+              alt={brand.label}
+              className="h-16 w-36 object-contain"
+            />
+          </AppLink>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+const FAQS = [
+  ["¿Cuándo obtengo envío gratis?", "En compras mayores a $1,000 MXN. Aplican restricciones según peso, volumen y destino."],
+  ["¿Cómo puedo dar seguimiento a mi pedido?", "Al confirmar tu compra recibirás una guía de rastreo en tu correo electrónico."],
+  ["¿Los productos tienen garantía?", "Sí. Todos nuestros productos cuentan con garantía de fabricante; el plazo depende de cada marca."],
+  ["¿Puedo recibir asesoría para mi proyecto?", "Claro. En sucursal te atendemos de 8:00 a 18:00, y también puedes escribirnos por WhatsApp."],
+] as const;
+
+export function Faq() {
+  return (
+    <section id="faq" className="bg-muted py-16">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 lg:grid-cols-[0.8fr_1.2fr]">
+        <div>
+          <span className="text-xs font-bold uppercase text-accent">Estamos para ayudarte</span>
+          <h2 className="mt-2 text-3xl font-extrabold text-black sm:text-4xl">Preguntas frecuentes</h2>
+          <p className="mt-4 max-w-md text-muted-foreground">
+            Resolvemos las dudas más comunes antes de tu compra. También puedes hablar con un asesor.
+          </p>
+          <Button variant="outline" className="mt-6 border-primary text-black" asChild>
+            <a href={WHATSAPP_URL}>
+              <MessageCircle /> Hablar por WhatsApp
+            </a>
+          </Button>
+        </div>
+        <Accordion type="single" collapsible className="border-t">
+          {FAQS.map(([q, a], i) => (
+            <AccordionItem key={q} value={`faq-${i}`}>
+              <AccordionTrigger className="py-5 text-base font-bold text-black">{q}</AccordionTrigger>
+              <AccordionContent className="pb-5 text-muted-foreground">{a}</AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
+    </section>
+  );
+}
+
+export function Sucursales() {
+  const first = BRANCHES[0];
+  const [active, setActive] = useState(first.id);
+  const branch: Branch = BRANCHES.find((item) => item.id === active) ?? first;
+  return (
+    <section id="sucursales" className="mx-auto max-w-7xl px-4 py-16">
+      <div className="text-center">
+        <span className="text-xs font-bold uppercase text-accent">Estamos cerca de ti</span>
+        <h2 className="mt-2 text-3xl font-extrabold text-black sm:text-4xl">Nuestras sucursales</h2>
+        <p className="mx-auto mt-4 max-w-3xl text-muted-foreground">
+          {EMPRESA_PRIORIDAD} Visítanos en Mazatlán y Culiacán, o pide envío a todo México.
+        </p>
+      </div>
+      <div className="mx-auto mt-10 max-w-3xl overflow-hidden rounded-3xl border bg-black shadow-sm">
+        <StoreVideo src={VIDEOS.marca.src} title={VIDEOS.marca.title} className="aspect-video w-full" />
+      </div>
+      <div className="mt-10 grid gap-4 lg:grid-cols-2 lg:items-stretch">
+        <div className="flex min-h-[520px] flex-col gap-2.5 lg:min-h-0">
+          {BRANCHES.map((item) => {
+            const selected = item.id === active;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setActive(item.id)}
+                aria-pressed={selected}
+                className={`group flex min-h-0 flex-1 items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left shadow-sm transition duration-200 ${
+                  selected
+                    ? "bg-primary text-primary-foreground shadow-md ring-2 ring-secondary/80"
+                    : "border border-border/80 bg-card text-black hover:border-primary/25 hover:bg-muted hover:shadow-md"
+                }`}
+              >
+                <span className="flex min-w-0 items-center gap-3">
+                  <span
+                    className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${
+                      selected ? "bg-secondary text-secondary-foreground" : "bg-muted text-secondary"
+                    }`}
+                  >
+                    <MapPin className="size-4" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate font-display text-sm font-extrabold sm:text-[15px]">{item.name}</span>
+                    <span className={`mt-0.5 block text-xs font-medium ${selected ? "text-primary-foreground/75" : "text-muted-foreground"}`}>
+                      {item.city}
+                    </span>
+                  </span>
+                </span>
+                <ArrowRight className={`size-4 shrink-0 transition ${selected ? "text-secondary" : "text-muted-foreground group-hover:translate-x-0.5 group-hover:text-black"}`} />
+              </button>
+            );
+          })}
+        </div>
+        <article className="flex min-h-[520px] flex-col overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm lg:min-h-full">
+          <div className="relative min-h-[280px] flex-1 bg-muted">
+            <iframe
+              key={branch.id}
+              title={`Ubicación de ${branch.name}`}
+              src={branch.mapEmbed}
+              className="absolute inset-0 h-full w-full border-0"
+              loading="lazy"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+          </div>
+          <div className="border-t bg-card px-4 py-4 sm:px-5">
+            <div className="flex items-end justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">{branch.city}</p>
+                <h3 className="mt-0.5 truncate font-display text-lg font-extrabold text-black sm:text-xl">{branch.name}</h3>
+              </div>
+            </div>
+            <div className="mt-3 flex flex-col gap-1.5 text-xs text-muted-foreground sm:text-sm">
+              <p className="flex min-w-0 items-start gap-1.5">
+                <MapPin className="mt-0.5 size-3.5 shrink-0 text-secondary" />
+                <span className="leading-snug">
+                  {branch.address}
+                  {branch.note ? ` · ${branch.note}` : ""}
+                </span>
+              </p>
+              <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                <Phone className="size-3.5 shrink-0 text-secondary" />
+                {branch.phones.map((phone) => (
+                  <a key={phone} href={telHref(phone)} className="font-semibold text-black hover:underline">
+                    {phone}
+                  </a>
+                ))}
+              </p>
+              <div className="flex flex-col gap-1">
+                {branch.emails.map((correo) => (
+                  <a
+                    key={correo}
+                    href={`mailto:${correo}`}
+                    className="flex min-w-0 items-center gap-1.5 break-all font-semibold text-black hover:underline"
+                  >
+                    <Mail className="size-3.5 shrink-0 text-secondary" />
+                    {correo}
+                  </a>
+                ))}
+              </div>
+            </div>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              <Button asChild className="h-10 rounded-xl bg-secondary px-2 text-xs font-bold text-secondary-foreground shadow-none hover:bg-secondary/90 sm:text-sm">
+                <a href={mapsDirHref(branch.address)} target="_blank" rel="noreferrer">
+                  <Navigation /> Cómo llegar
+                </a>
+              </Button>
+              <Button asChild variant="outline" className="h-10 rounded-xl border-primary/15 px-2 text-xs font-bold text-black hover:bg-primary hover:text-primary-foreground sm:text-sm">
+                <a href={telHref(branch.phones[0] ?? TEL_PRINCIPAL)}>
+                  <Phone /> Llamar
+                </a>
+              </Button>
+              <Button asChild variant="outline" className="h-10 rounded-xl border-primary/15 px-2 text-xs font-bold text-black hover:bg-primary hover:text-primary-foreground sm:text-sm">
+                <a href={emailDe(branch) ? `mailto:${emailDe(branch)}` : WHATSAPP_URL} target={emailDe(branch) ? undefined : "_blank"} rel="noreferrer">
+                  {emailDe(branch) ? <Mail /> : <MessageCircle />} Cotizar
+                </a>
+              </Button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+export function PrivacyNotice() {
+  return (
+    <section id="aviso-privacidad" className="border-t bg-background py-12">
+      <div className="mx-auto max-w-3xl px-4 text-center">
+        <h2 className="text-2xl font-extrabold text-black">Aviso de privacidad</h2>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          {EMPRESA_RAZON}, con domicilio en {DOMICILIO_MATRIZ}, utiliza tus datos personales únicamente para atender cotizaciones, pedidos,
+          facturación y envíos. No compartimos tu información con terceros ajenos a estos fines. Para ejercer tus derechos
+          ARCO comunícate al{" "}
+          <a className="font-semibold text-black hover:underline" href={telHref(TEL_PRINCIPAL)}>
+            (669) 982-39-40
+          </a>
+          {MAIN_EMAIL ? (
+            <>
+              {" "}
+              o escríbenos a{" "}
+              <a className="font-semibold text-black hover:underline" href={`mailto:${MAIN_EMAIL}`}>
+                {MAIN_EMAIL}
+              </a>
+            </>
+          ) : null}
+          .
+        </p>
+      </div>
+    </section>
+  );
+}
+
+export function SiteFooter() {
+  return (
+    <footer className="bg-primary text-primary-foreground">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center justify-center bg-background p-1.5">
+              <img src={LOGO_MARK} alt="" className="h-14 w-auto object-contain" />
+            </span>
+            <span className="font-display text-lg font-extrabold leading-tight">
+              Eléctrica
+              <br />
+              Valdez
+            </span>
+          </div>
+          <p className="mt-4 text-sm font-semibold text-primary-foreground/80">{EMPRESA_RAZON}</p>
+          <p className="mt-2 text-sm leading-relaxed text-primary-foreground/70">
+            Material eléctrico, iluminación y ferretería. {EMPRESA_PRIORIDAD}
+          </p>
+          <div className="mt-5 flex gap-2">
+            <Button size="icon" variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground" asChild>
+              <a href={FACEBOOK_URL} target="_blank" rel="noreferrer" aria-label="Facebook de Eléctrica Valdez">
+                <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
+                  <path fill="currentColor" d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H8v3h2v7h3v-7h2.6l.4-3H13v-2c0-.6.4-1 1-1Z" />
+                </svg>
+              </a>
+            </Button>
+            <Button size="icon" variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground" asChild>
+              <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" aria-label="WhatsApp">
+                <MessageCircle />
+              </a>
+            </Button>
+            {MAIN_EMAIL ? (
+              <Button size="icon" variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground" asChild>
+                <a href={`mailto:${MAIN_EMAIL}`} aria-label="Correo">
+                  <Mail />
+                </a>
+              </Button>
+            ) : null}
+            <Button size="icon" variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground" asChild>
+              <a href={telHref(TEL_PRINCIPAL)} aria-label="Teléfono">
+                <Phone />
+              </a>
+            </Button>
+          </div>
+        </div>
+        <div>
+          <h3 className="text-base font-bold text-secondary">Contacto</h3>
+          <ul className="mt-4 space-y-3 text-sm text-primary-foreground/70">
+            {TELEFONOS_PIE.map((telefono) => (
+              <li key={telefono.digits}>
+                <a className="hover:text-primary-foreground" href={telHref(telefono.digits)}>
+                  Tel. {telefono.label}
+                </a>
+              </li>
+            ))}
+            {MAIN_EMAILS.map((correo) => (
+              <li key={correo}>
+                <a className="break-all hover:text-primary-foreground" href={`mailto:${correo}`}>
+                  {correo}
+                </a>
+              </li>
+            ))}
+            <li>
+              <a className="hover:text-primary-foreground" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
+                WhatsApp {WHATSAPP_DISPLAY}
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 className="text-base font-bold text-secondary">Sucursales</h3>
+          <ul className="mt-4 space-y-3 text-sm text-primary-foreground/70">
+            {BRANCHES.map((branch) => (
+              <li key={branch.id}>
+                <AppLink to="/#sucursales" className="hover:text-primary-foreground">
+                  {branch.name}
+                </AppLink>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 className="text-base font-bold text-secondary">Información</h3>
+          <ul className="mt-4 space-y-3 text-sm text-primary-foreground/70">
+            <li>
+              <AppLink to="/#faq" className="hover:text-primary-foreground">
+                Preguntas frecuentes
+              </AppLink>
+            </li>
+            <li>
+              <AppLink to="/#sucursales" className="hover:text-primary-foreground">
+                Cobertura y envíos
+              </AppLink>
+            </li>
+            <li>
+              <a href={MAIN_EMAIL ? `mailto:${MAIN_EMAIL}` : WHATSAPP_URL} className="hover:text-primary-foreground">
+                Contacto directo
+              </a>
+            </li>
+            <li>
+              <a href={FACEBOOK_URL} target="_blank" rel="noreferrer" className="hover:text-primary-foreground">
+                Facebook
+              </a>
+            </li>
+            <li>
+              <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="hover:text-primary-foreground">
+                WhatsApp
+              </a>
+            </li>
+            <li>
+              <AppLink to="/#aviso-privacidad" className="hover:text-primary-foreground">
+                Aviso de privacidad
+              </AppLink>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div className="border-t border-primary-foreground/15">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-xs text-primary-foreground/60 sm:flex-row sm:justify-between">
+          <span>© {new Date().getFullYear()} {EMPRESA_RAZON}. Todos los derechos reservados.</span>
+          <span>Visa · Mastercard · American Express · PayPal</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+export function PreFooterLeyenda() {
+  const items = [
+    { icon: MessageCircle, title: "Conoce nuestro centro de atención", text: "Atención y servicio" },
+    { icon: Package, title: "Entregas confiables", text: "Actualización y seguimiento de tu envío" },
+    { icon: Truck, title: "Envíos", text: "Seguridad de tus envíos" },
+    { icon: CircleDollarSign, title: "Precios competitivos", text: "Buscamos los mejores proveedores" },
+  ];
+
+  return (
+    <div className="bg-background">
+      <section className="border-y" aria-label="Beneficios de compra">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:grid-cols-2 lg:grid-cols-4">
+          {items.map(({ icon: Icon, title, text }) => (
+            <div key={title} className="flex items-start gap-3 text-black">
+              <Icon className="mt-0.5 size-8 shrink-0" strokeWidth={1.5} />
+              <div>
+                <h3 className="text-sm font-bold leading-snug">{title}</h3>
+                <p className="mt-1 text-xs text-muted-foreground">{text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+      <div className="py-5 text-center">
+        <button
+          type="button"
+          className="text-sm font-semibold text-black hover:underline"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        >
+          Volver al principio
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function CompactFooter() {
+  return <SiteFooter />;
+}

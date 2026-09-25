@@ -1,0 +1,16 @@
+name = "electrica-valdez"
+main = "worker/index.ts"
+compatibility_date = "2026-09-11"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*", "/health"]
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[vars]
+APP_NAME = "Eléctrica Valdez"
+GROQ_VISION_MODEL = "qwen/qwen3.8-27b"
