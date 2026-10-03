@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { LoaderCircle, Mic, X } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
-import { ImageSearchDialog } from "@/components/ImageSearchDialog";
 import { ProductImage } from "@/components/ProductImage";
 import { useCart } from "@/context/CartContext";
 import { fetchCatalogo, preguntarAsistente } from "@/lib/api";
@@ -47,21 +46,6 @@ function mezclarSugerencias(catalogo: Producto[], locales: Producto[], q: string
   return out.sort((a, b) => puntuacion(b, q) - puntuacion(a, q) || a.nombre.localeCompare(b.nombre, "es")).slice(0, limite);
 }
 
-/** Icono estilo Google Lens (marco con esquina y punto), sin lupa. */
-function LensIcon({ className = "size-5" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
-      <path
-        d="M7 3H5a2 2 0 0 0-2 2v2M17 3h2a2 2 0 0 1 2 2v2M7 21H5a2 2 0 0 1-2-2v-2M17 21h2a2 2 0 0 0 2-2v-2"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-      />
-      <circle cx="12" cy="12" r="3.25" stroke="currentColor" strokeWidth="1.75" />
-    </svg>
-  );
-}
-
 export function SearchBar({
   value,
   onChange,
@@ -74,7 +58,6 @@ export function SearchBar({
   const [turno, setTurno] = useState<RespuestaAsistente | null>(null);
   const [cargando, setCargando] = useState(false);
   const [escuchando, setEscuchando] = useState(false);
-  const [lente, setLente] = useState(false);
   const [error, setError] = useState("");
   const box = useRef<HTMLFormElement>(null);
   const reconocimiento = useRef<SpeechRecognitionLike | null>(null);
@@ -182,7 +165,7 @@ export function SearchBar({
 
   return (
     <form ref={box} onSubmit={enviar} className="relative w-full">
-      <div className="group relative flex h-12 w-full items-center rounded-full border border-border/80 bg-background shadow-sm transition-[border-color,box-shadow] focus-within:border-primary/40 focus-within:shadow-md">
+      <div className="group relative flex h-[3.25rem] w-full items-center overflow-hidden rounded-[1.6rem] border border-slate-200/80 bg-gradient-to-r from-white via-slate-50 to-white shadow-[0_12px_28px_rgba(15,23,42,0.08)] ring-1 ring-slate-100 transition-all duration-200 focus-within:border-primary/50 focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.12),0_18px_40px_rgba(15,23,42,0.12)]">
         <input
           value={value}
           onChange={(e) => {
@@ -199,69 +182,49 @@ export function SearchBar({
           aria-autocomplete="list"
           autoComplete="off"
           placeholder={placeholder}
-          className="h-full min-w-0 flex-1 rounded-full bg-transparent py-2 pl-5 pr-2 text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
+          className="h-full min-w-0 flex-1 rounded-[1.6rem] bg-transparent py-2 pl-5 pr-2 text-[15px] font-medium text-slate-900 outline-none placeholder:text-slate-500"
         />
-        <div className="flex shrink-0 items-center gap-0.5 pr-2">
+        <div className="mr-2 flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200/80 bg-white/90 p-1.5 shadow-sm backdrop-blur-sm">
           {value ? (
-            <button
-              type="button"
-              aria-label="Limpiar búsqueda"
-              onClick={() => {
-                onChange("");
-                setSugerencias([]);
-                setTurno(null);
-                setError("");
-                setAbierto(false);
-              }}
-              className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
-            >
-              <X className="size-[18px]" strokeWidth={2} />
-            </button>
+            <>
+              <button
+                type="button"
+                aria-label="Limpiar búsqueda"
+                onClick={() => {
+                  onChange("");
+                  setSugerencias([]);
+                  setTurno(null);
+                  setError("");
+                  setAbierto(false);
+                }}
+                className="rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              >
+                <X className="size-[18px]" strokeWidth={2} />
+              </button>
+              <span className="hidden h-5 w-px bg-slate-200 sm:block" aria-hidden="true" />
+            </>
           ) : null}
-          <span className="mx-0.5 hidden h-6 w-px bg-border sm:block" aria-hidden="true" />
           <button
             type="button"
             aria-label={escuchando ? "Detener voz" : "Buscar por voz"}
             title="Buscar por voz"
             onClick={hablar}
-            className={`rounded-full p-2 transition-colors ${
-              escuchando ? "bg-sale/10 text-sale" : "text-muted-foreground hover:bg-muted hover:text-black"
+            className={`rounded-full p-2.5 transition-all duration-200 ${
+              escuchando
+                ? "bg-amber-100 text-amber-700 shadow-inner"
+                : "bg-slate-100 text-slate-700 hover:bg-primary hover:text-white hover:shadow-md"
             }`}
           >
             {escuchando ? <LoaderCircle className="size-5 animate-spin" /> : <Mic className="size-5" strokeWidth={1.75} />}
           </button>
-          <button
-            type="button"
-            aria-label="Buscar por imagen con IA"
-            title="Buscar por imagen"
-            onClick={() => {
-              setAbierto(false);
-              setLente(true);
-            }}
-            className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-black"
-          >
-            <LensIcon className="size-5" />
-          </button>
         </div>
       </div>
-
-      <ImageSearchDialog
-        open={lente}
-        onOpenChange={setLente}
-        searchPath={searchPath}
-        onIdentified={(q, productos) => {
-          onChange(q);
-          setTurno(null);
-          setError("");
-          setSugerencias(mezclarSugerencias(productos, sugerenciasLocales(q), q));
-        }}
-      />
 
       {mostrarPanel ? (
         <div
           role="listbox"
           aria-label="Sugerencias de productos"
-          className="absolute left-0 right-0 top-[3.25rem] z-50 max-h-[70vh] overflow-y-auto rounded-2xl border bg-background p-2 shadow-xl"
+          className="absolute left-0 right-0 top-[3.5rem] z-50 max-h-[70vh] overflow-y-auto rounded-[1.5rem] border border-slate-200 bg-white/95 p-2 shadow-[0_20px_50px_rgba(15,23,42,0.15)] backdrop-blur-sm"
         >
           {escuchando ? (
             <p className="px-2 py-3 text-sm text-muted-foreground">Escuchando… di el material que necesitas.</p>
